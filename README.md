@@ -6,7 +6,7 @@ Kernel: `6.1.138-android14-11` / HyperOS OS3.0.302.0.WNNCNXM.
 ## ⚠️ 前置条件
 
 - **设备**: Redmi K70 Ultra (codename: rothko), Android 14 / HyperOS OS3.0.302.0.WNNCNXM
-- **BL 已解锁**（必须 —— 否则无法 adb 推送 / Shizuku 运行）
+- **无需解 BL** — 通过 Shizuku（无线调试）即可获得 shell 权限来运行
 - **Shizuku** 或 **adb shell** 可执行 arm64 二进制
 - 运行后**设备会重启**（内核 panic — 预期行为）。如需保存日志，提前连好 adb logcat
 
@@ -31,16 +31,23 @@ adb shell /data/local/tmp/ghostlock_rothko_strip
 
 ### 方法 2：通过 Shizuku
 
+前提：Shizuku 已启动（无线调试授权），有任一终端 App（如 Termux）已授权 Shizuku。
+
 ```bash
-# 用 Shizuku 推送二进制
-adb shell sh -c 'cat /dev/null > /data/local/tmp/ghostlock_rothko_strip'
-# 然后用 Shizuku 的 "运行文件" 功能选中 gh lock_rothko_strip
+# 用 adb 把 binary 推到设备
+adb push ghostlock_rothko_strip /data/local/tmp/
+adb shell chmod 755 /data/local/tmp/ghostlock_rothko_strip
+
+# 在 Termux 里（已授权 Shizuku）直接执行：
+adb shell /data/local/tmp/ghostlock_rothko_strip
 ```
 
-或使用 Shizuku 的 terminal 模拟器直接执行：
+如果不想连电脑，先把文件传到手机，然后在 Termux 里：
 
 ```bash
-adb shell sh -c 'cp /sdcard/Download/ghostlock_rothko_strip /data/local/tmp/ && chmod 755 /data/local/tmp/ghostlock_rothko_strip && /data/local/tmp/ghostlock_rothko_strip'
+cp /sdcard/Download/ghostlock_rothko_strip /data/local/tmp/
+chmod 755 /data/local/tmp/ghostlock_rothko_strip
+/data/local/tmp/ghostlock_rothko_strip
 ```
 
 ### 方法 3：LD_PRELOAD 注入模式
